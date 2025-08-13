@@ -1,0 +1,189 @@
+{
+  "name": "Customer Support Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "73fad372-475f-42c0-9553-d2caa04b65a1",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HYevksvVlCFeMa0k",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Customer Support Email",
+              "description": "An email that is related to customer support. It may be customer asking queries, doubts, complains or information provided to customer."
+            },
+            {
+              "category": "Other",
+              "description": "An email which is not related to customer queries, doubts or complains."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8a530ea8-b88a-4845-aa78-06a96ea280e3",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        208
+      ],
+      "id": "1bd05d47-6a93-4c7b-bfeb-b4a4730784e6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qlEqoI0CY07dX5ZZ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Gmail Trigger": {
+      "Gmail Trigger": {
+        "lastTimeChecked": 1753698103
+      }
+    }
+  },
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "198429a5d64c91ee",
+          "threadId": "198429a5d64c91ee",
+          "labelIds": [
+            "UNREAD",
+            "CATEGORY_UPDATES",
+            "INBOX"
+          ],
+          "sizeEstimate": 13683,
+          "headers": {
+            "delivered-to": "Delivered-To: theindersharma@gmail.com",
+            "received": "Received: from mail-sor-f73.google.com (mail-sor-f73.google.com. [209.85.220.73])\r\n        by mx.google.com with SMTPS id 8926c6da1cb9f-508b0b81500sor1321286173.5.2025.07.25.10.21.09\r\n        for <theindersharma@gmail.com>\r\n        (Google Transport Security);\r\n        Fri, 25 Jul 2025 10:21:09 -0700 (PDT)",
+            "x-received": "X-Received: by 2002:a05:6602:3fd3:b0:87c:1424:6189 with SMTP id\r\n ca18e2360f4ac-87fb99561f2mr350577839f.3.1753464069113; Fri, 25 Jul 2025\r\n 10:21:09 -0700 (PDT)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1753464069; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=QymdU2d5rWOL/eKHHMUAKRo0/1gRuI2hQT/pXCM0On2EmBssKPiM1k5yKTZEQyQVs2\r\n         cRfgYP0m4IbqfF35l9fb2EX7kIEgcWueAAjYYrcS09uFIzPWsE3MTUgT+E/DCzafXJ/8\r\n         8UaFnUHWB+QlshybQhy/mCEPi1fznDaYbwSoofo5iliSJvLllSJZWj9dVGG4gi7jst+E\r\n         Pb/HG/J6F6URPNJjdOK7KKJR6YRIOmKoUJ50yrj/VQ9qmW3+2+L2P8h9mJkph5q6aJ8F\r\n         zXGyc7601L9Ou4XmpfU2cMU/ekrk05fJKL9XqWdrAXsiVyYPbh4BowPvR9ye3LLDirc/\r\n         LXjA==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:from:subject:message-id:feedback-id:date:mime-version\r\n         :dkim-signature;\r\n        bh=0raHOwV0xcJVbAyQMn8ns2CYZgqzdA7UC7n4/HcuFG4=;\r\n        fh=tvPeDPrKC8ulz7b/8FIa+KyVQ/loNVlFq+HWpBh7oM0=;\r\n        b=UmdBc0L68jeUgDWV0bxB5znWoKCpHNEAFd/YFwavVJuwWvlnRWTP2JK8OL2snI2Epl\r\n         oopQiLfKKHBhP8uYPzR0CWNVYAkh9PqLPweCkRwSTRzNDMQrJCCbGvZWZiwHm6VjHdQX\r\n         8Yg0GzPyjMxcoCX4IIqajZi4TBpBgdMa7uYlPvPe2PJfhwvJWorzTaTvOV7D3PeIjOnn\r\n         PVtxm6FBXiw4XaamOKfutNlYDW+gFN35MCkWy5AZpy8ax4GQse3YM4zMBQ9A3l4YUW48\r\n         7YKrVjo1EFZ5CQkSzW61wx7lz1iubqJ/AEPV8bNnBvWH5RaHvx7PNtzzmTJfX6AePqnN\r\n         YSFg==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@accounts.google.com header.s=20230601 header.b=F0jIcP2v;\r\n       spf=pass (google.com: domain of 3bb2daagtdtghi-l8jfs466iohnm.aiiaf8.6ignb8ch78lmb4lg4ag4cf.6ig@gaia.bounces.google.com designates 209.85.220.73 as permitted sender) smtp.mailfrom=3Bb2DaAgTDtgHI-L8JFS466IOHNM.AIIAF8.6IGNB8CH78LMB4LG4AG4CF.6IG@gaia.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=accounts.google.com;\r\n       dara=pass header.i=@gmail.com",
+            "return-path": "Return-Path: <3Bb2DaAgTDtgHI-L8JFS466IOHNM.AIIAF8.6IGNB8CH78LMB4LG4AG4CF.6IG@gaia.bounces.google.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of 3bb2daagtdtghi-l8jfs466iohnm.aiiaf8.6ignb8ch78lmb4lg4ag4cf.6ig@gaia.bounces.google.com designates 209.85.220.73 as permitted sender) client-ip=209.85.220.73;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@accounts.google.com header.s=20230601 header.b=F0jIcP2v;\r\n       spf=pass (google.com: domain of 3bb2daagtdtghi-l8jfs466iohnm.aiiaf8.6ignb8ch78lmb4lg4ag4cf.6ig@gaia.bounces.google.com designates 209.85.220.73 as permitted sender) smtp.mailfrom=3Bb2DaAgTDtgHI-L8JFS466IOHNM.AIIAF8.6IGNB8CH78LMB4LG4AG4CF.6IG@gaia.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=accounts.google.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=accounts.google.com; s=20230601; t=1753464069; x=1754068869; dara=google.com;\r\n        h=to:from:subject:message-id:feedback-id:date:mime-version:from:to:cc\r\n         :subject:date:message-id:reply-to;\r\n        bh=0raHOwV0xcJVbAyQMn8ns2CYZgqzdA7UC7n4/HcuFG4=;\r\n        b=F0jIcP2vpb6iZUy0MczeduZd5g/efUXDDo+Q30IohHRKMwC53mcEAScZGvSlVll2GX\r\n         lw5teXNgEIi9lnr/bkj09fcFTBP7pbW51G2Eia3NH6cCdNSRrqeGe+GHKdHVamc0kdNf\r\n         Hf5wHfoWtq/q7OUFNce6WGVzBCaE3ak9jywRAxYdgHOq52hkHkRZjaiMk1RvpmJIYF7w\r\n         0BxxwkfBjGo5MZjrZFJKQFe0E1csQLickWZU11draQt90/iPuuvpLPS6mHLpy1YIwnXH\r\n         u+0j952yEHeHf58qKO/yqzynJutK48Tr2bYl+FLsZOeY5/eF6EVLtdVkcUGGlTMmufVk\r\n         mQtg==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1753464069; x=1754068869;\r\n        h=to:from:subject:message-id:feedback-id:date:mime-version\r\n         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;\r\n        bh=0raHOwV0xcJVbAyQMn8ns2CYZgqzdA7UC7n4/HcuFG4=;\r\n        b=mWp0QBVA+h8Q+qwzpJ6S7sL9+0Mv3pPXoy+HzKt+wSkOCOCVdYvEMy3fq7/HFbeyoj\r\n         Z5cVBZdqXLXvTsofhJK++6uOV0ioLIKqhaLsuJ8jb+OPP0R2EEkFAu6qxA66YxRUkLln\r\n         8kleWTg4NxdMdNQTws9VicrC0Ub7mwShEXHLuSOgauxd6+9E/73mqVLwA+kbtb5g1lht\r\n         T3UPdKjYKWLJGM00V6tcePcbnF44t3H/31ziCWjKauTEhCYXgPHsNqmnJ22oL0WlYZz7\r\n         oq6hNVDUMXj4ETtDFEBF0X3UY+jxjvcDN96uFgZ4LptG2uw5TjqdB4PtOKqxTnLP+0hG\r\n         XRvg==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0YzFHSBEyuFUFFI52mleDCUSUNMrFRZOG1VrLKSIh6RRarjX5bjk\r\n\tyV0rO/MyGTHeYWuCqSOytWnUZJRNFMJnNA4/9HwpOKb9Q9kKWkGInFJPt7DvhZRXeZnCeStlb4R\r\n\tLtdFfuP/OfENAhC99Oc987X/6eQwwuPZFmiElVRc=",
+            "x-google-smtp-source": "X-Google-Smtp-Source: AGHT+IGpfjhvj+bG4dm2fhQ+ssAgD0V4YffGt4dMvRc3tUmLIIiuElmK32ERO32tAaG0mx84yhXWwuzmOCrg/Gfqt6H7nA==",
+            "mime-version": "MIME-Version: 1.0",
+            "date": "Date: Fri, 25 Jul 2025 17:21:08 GMT",
+            "x-account-notification-type": "X-Account-Notification-Type: 127",
+            "feedback-id": "Feedback-ID: 127:account-notifier",
+            "x-notifications": "X-Notifications: bbb0f29790da0000",
+            "x-notifications-bounce-info": "X-Notifications-Bounce-Info: AWoTSIEJt2UavyPyMJTsGU63EFHMLUMgZaIJ4KB9b8qnG-N7UhQhTUJBaS9nzLTj2MVfegL8tskv-mqRMMABZN77YspAdsGidwKthKqx21NNZcCi1qmukF-mw7ZQWibABuR8eq15TtMGTpK5vsKfvpH9SD8PoEUjcBKt6_IUwW7-D_J9f0Y4GUocEcOjCz5jBDPOIr1EluwyT_LZdVJM1W8NjAwNjA0MDQxNTM1NTk2OTMzMg",
+            "message-id": "Message-ID: <p6Ikw9C1o-2AELSTwYLuWg@notifications.google.com>",
+            "subject": "Subject: Security alert",
+            "from": "From: Google <no-reply@accounts.google.com>",
+            "to": "To: theindersharma@gmail.com",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"000000000000f74727063ac42aab\""
+          },
+          "html": "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"format-detection\" content=\"email=no\"/><meta name=\"format-detection\" content=\"date=no\"/><style nonce=\"hz4yrW1aTGq2f-BMv9fY6Q\">.awl a {color: #FFFFFF; text-decoration: none;} .abml a {color: #000000; font-family: Roboto-Medium,Helvetica,Arial,sans-serif; font-weight: bold; text-decoration: none;} .adgl a {color: rgba(0, 0, 0, 0.87); text-decoration: none;} .afal a {color: #b0b0b0; text-decoration: none;} @media screen and (min-width: 600px) {.v2sp {padding: 6px 30px 0px;} .v2rsp {padding: 0px 10px;}} @media screen and (min-width: 600px) {.mdv2rw {padding: 40px 40px;}} </style><link href=\"//fonts.googleapis.com/css?family=Google+Sans\" rel=\"stylesheet\" type=\"text/css\" nonce=\"hz4yrW1aTGq2f-BMv9fY6Q\"/></head><body style=\"margin: 0; padding: 0;\" bgcolor=\"#FFFFFF\"><table width=\"100%\" height=\"100%\" style=\"min-width: 348px;\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" lang=\"en\"><tr height=\"32\" style=\"height: 32px;\"><td></td></tr><tr align=\"center\"><td><div itemscope itemtype=\"//schema.org/EmailMessage\"><div itemprop=\"action\" itemscope itemtype=\"//schema.org/ViewAction\"><link itemprop=\"url\" href=\"https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&amp;continue=https://myaccount.google.com/alert/nt/1753464068000?rfn%3D127%26rfnc%3D1%26eid%3D-1570351736757655367%26et%3D0\"/><meta itemprop=\"name\" content=\"Review Activity\"/></div></div><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"padding-bottom: 20px; max-width: 516px; min-width: 220px;\"><tr><td width=\"8\" style=\"width: 8px;\"></td><td><div style=\"border-style: solid; border-width: thin; border-color:#dadce0; border-radius: 8px; padding: 40px 20px;\" align=\"center\" class=\"mdv2rw\"><img src=\"https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_74x24dp.png\" width=\"74\" height=\"24\" aria-hidden=\"true\" style=\"margin-bottom: 16px;\" alt=\"Google\"><div style=\"font-family: &#39;Google Sans&#39;,Roboto,RobotoDraft,Helvetica,Arial,sans-serif;border-bottom: thin solid #dadce0; color: rgba(0,0,0,0.87); line-height: 32px; padding-bottom: 24px;text-align: center; word-break: break-word;\"><div style=\"font-size: 24px;\">You allowed n8n.cloud access to some of your Google Account data </div><table align=\"center\" style=\"margin-top:8px;\"><tr style=\"line-height: normal;\"><td align=\"right\" style=\"padding-right:8px;\"><img width=\"20\" height=\"20\" style=\"width: 20px; height: 20px; vertical-align: sub; border-radius: 50%;;\" src=\"https://lh3.googleusercontent.com/a/ACg8ocKikYQlhtD6LExvqePhDVQVoCUlBNGxkHH4HulexYrOqMwV0w=s96-c\" alt=\"\"></td><td><a style=\"font-family: &#39;Google Sans&#39;,Roboto,RobotoDraft,Helvetica,Arial,sans-serif;color: rgba(0,0,0,0.87); font-size: 14px; line-height: 20px;\">theindersharma@gmail.com</a></td></tr></table> </div><div style=\"font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 14px; color: rgba(0,0,0,0.87); line-height: 20px;padding-top: 20px; text-align: left;\"><br><p>If you didn't allow n8n.cloud access to some of your Google Account data, someone else may be trying to access your Google Account data.</p><p>Take a moment now to check your account activity and secure your account.</p><div style=\"padding-top: 32px; text-align: center;\"><a href=\"https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&amp;continue=https://myaccount.google.com/alert/nt/1753464068000?rfn%3D127%26rfnc%3D1%26eid%3D-1570351736757655367%26et%3D0\" target=\"_blank\" link-id=\"main-button-link\" style=\"font-family: &#39;Google Sans&#39;,Roboto,RobotoDraft,Helvetica,Arial,sans-serif; line-height: 16px; color: #ffffff; font-weight: 400; text-decoration: none;font-size: 14px;display:inline-block;padding: 10px 24px;background-color: #4184F3; border-radius: 5px; min-width: 90px;\">Check activity</a></div><div style=\"padding-top: 40px;\"><div style=\"border-bottom: thin solid #dadce0; padding-bottom: 24px;\">To make changes at any time to the access that n8n.cloud has to your data, go to your <a href=\"https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&amp;continue=https://myaccount.google.com/connections/overview/AXgE0HO_2SVGxZsZZX6oy4BxDwoAgJxdEouMXP_wTdHjclqwNiM3l6vjG0HNTUg12nWt1SJf5XinO7pqIEv_S88nDds?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue\" style=\"text-decoration: none; color: #4285F4;\" target=\"_blank\">Google Account</a></div></div></div><div style=\"padding-top: 20px; font-size: 12px; line-height: 16px; color: #5f6368; letter-spacing: 0.3px; text-align: center\">You can also see security activity at<br><a style=\"color: rgba(0, 0, 0, 0.87);text-decoration: inherit;\">https://myaccount.google.com/notifications</a></div></div><div style=\"text-align: left;\"><div style=\"font-family: Roboto-Regular,Helvetica,Arial,sans-serif;color: rgba(0,0,0,0.54); font-size: 11px; line-height: 18px; padding-top: 12px; text-align: center;\"><div>You received this email to let you know about important changes to your Google Account and services.</div><div style=\"direction: ltr;\">&copy; 2025 Google LLC, <a class=\"afal\" style=\"font-family: Roboto-Regular,Helvetica,Arial,sans-serif;color: rgba(0,0,0,0.54); font-size: 11px; line-height: 18px; padding-top: 12px; text-align: center;\">1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</a></div></div></div></td><td width=\"8\" style=\"width: 8px;\"></td></tr></table></td></tr><tr height=\"32\" style=\"height: 32px;\"><td></td></tr></table></body></html>",
+          "text": "[image: Google]\nYou allowed n8n.cloud access to some of your Google Account data\n\n\ntheindersharma@gmail.com\n\nIf you didn't allow n8n.cloud access to some of your Google Account data,\nsomeone else may be trying to access your Google Account data.\n\nTake a moment now to check your account activity and secure your account.\nCheck activity\n<https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&continue=https://myaccount.google.com/alert/nt/1753464068000?rfn%3D127%26rfnc%3D1%26eid%3D-1570351736757655367%26et%3D0>\nTo make changes at any time to the access that n8n.cloud has to your data,\ngo to your Google Account\n<https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&continue=https://myaccount.google.com/connections/overview/AXgE0HO_2SVGxZsZZX6oy4BxDwoAgJxdEouMXP_wTdHjclqwNiM3l6vjG0HNTUg12nWt1SJf5XinO7pqIEv_S88nDds?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue>\nYou can also see security activity at\nhttps://myaccount.google.com/notifications\nYou received this email to let you know about important changes to your\nGoogle Account and services.\n© 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA\n",
+          "textAsHtml": "<p>[image: Google]<br/>You allowed <a href=\"http://n8n.cloud\">n8n.cloud</a> access to some of your Google Account data</p><p><a href=\"mailto:theindersharma@gmail.com\">theindersharma@gmail.com</a></p><p>If you didn&apos;t allow <a href=\"http://n8n.cloud\">n8n.cloud</a> access to some of your Google Account data,<br/>someone else may be trying to access your Google Account data.</p><p>Take a moment now to check your account activity and secure your account.<br/>Check activity<br/>&lt;<a href=\"https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&continue=https://myaccount.google.com/alert/nt/1753464068000?rfn%3D127%26rfnc%3D1%26eid%3D-1570351736757655367%26et%3D0\">https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&continue=https://myaccount.google.com/alert/nt/1753464068000?rfn%3D127%26rfnc%3D1%26eid%3D-1570351736757655367%26et%3D0</a>&gt;<br/>To make changes at any time to the access that <a href=\"http://n8n.cloud\">n8n.cloud</a> has to your data,<br/>go to your Google Account<br/>&lt;<a href=\"https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&continue=https://myaccount.google.com/connections/overview/AXgE0HO_2SVGxZsZZX6oy4BxDwoAgJxdEouMXP_wTdHjclqwNiM3l6vjG0HNTUg12nWt1SJf5XinO7pqIEv_S88nDds?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue\">https://accounts.google.com/AccountChooser?Email=theindersharma@gmail.com&continue=https://myaccount.google.com/connections/overview/AXgE0HO_2SVGxZsZZX6oy4BxDwoAgJxdEouMXP_wTdHjclqwNiM3l6vjG0HNTUg12nWt1SJf5XinO7pqIEv_S88nDds?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue</a>&gt;<br/>You can also see security activity at<br/><a href=\"https://myaccount.google.com/notifications\">https://myaccount.google.com/notifications</a><br/>You received this email to let you know about important changes to your<br/>Google Account and services.<br/>&copy; 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p>",
+          "subject": "Security alert",
+          "date": "2025-07-25T17:21:08.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "theindersharma@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:theindersharma@gmail.com\" class=\"mp_address_email\">theindersharma@gmail.com</a></span>",
+            "text": "theindersharma@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "no-reply@accounts.google.com",
+                "name": "Google"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Google</span> &lt;<a href=\"mailto:no-reply@accounts.google.com\" class=\"mp_address_email\">no-reply@accounts.google.com</a>&gt;</span>",
+            "text": "\"Google\" <no-reply@accounts.google.com>"
+          },
+          "messageId": "<p6Ikw9C1o-2AELSTwYLuWg@notifications.google.com>"
+        }
+      }
+    ]
+  },
+  "triggerCount": 1,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

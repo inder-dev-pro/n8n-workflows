@@ -1,0 +1,129 @@
+{
+  "name": "Multi Agent System",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "679d903d-725f-44f1-8970-2f69f0c608cd",
+      "name": "When chat message received",
+      "webhookId": "94fa3aa0-66e2-4725-a9fd-b0c2e2386248"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the Main Coordinator Agent in an n8n automation system. Your role is to delegate incoming tasks to the appropriate internal workflows based on task type and intent.\nYou do not process or respond to tasks directly. You do not generate output using your own model.\nInstead, you intelligently route requests to the correct workflow from your available tools, monitor execution, and return the final output produced by the workflow.\nAlways:\nUnderstand the task and choose the correct workflow.\nTrigger the selected workflow with the appropriate inputs.\nReturn the workflow’s output as-is, without modification or interpretation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0c40b6cc-8ce2-48ed-ae1a-52f044d69ab3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        208
+      ],
+      "id": "b26b3308-6709-4fbb-bc71-83b3eb246be6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qlEqoI0CY07dX5ZZ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool when we have to generate a LinkedIn post.",
+        "workflowId": {
+          "__rl": true,
+          "value": "WaVvq4LXbc7lhVsZ",
+          "mode": "list",
+          "cachedResultName": "Inder n8n — LinkedIn Content Creator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        272
+      ],
+      "id": "d8f9dd71-70be-49b5-8621-d5d8242ac470",
+      "name": "LinkedIn Agent"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
