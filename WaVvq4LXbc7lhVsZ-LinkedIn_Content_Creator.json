@@ -1,0 +1,136 @@
+{
+  "name": "LinkedIn Content Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"Search the web for Agentic AI \",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 3,\n  \"time_range\": null,\n  \"days\": null,\n  \"start_date\": null,\n  \"end_date\": null,\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        -16
+      ],
+      "id": "8bec6e31-ba50-4f19-bdf0-a8373d495732",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article 1: {{ $json.results[0].content }}\nArticle 2: {{ $json.results[1].content }}\nArticle 3: {{ $json.results[2].content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are writing a LinkedIn post aimed at a professional audience, including industry experts, researchers, and business leaders. You are provided with three articles from three different sources. Your task is to analyze, synthesize, and extract actionable insights from all three sources and present them in a cohesive and engaging post.\n\nFollow these guidelines:\n\nOpening (Hook):\nStart with a compelling question, surprising statistic, or strong statement to grab attention.\nClearly state the core topic or issue that links all three articles.\nContextual Overview:\nBriefly mention the relevance of the topic in today’s professional or industry context.\nIntroduce the three sources (name each publication or author briefly) to add credibility.\nKey Insights (Synthesis):\nExtract and summarize one key insight from each article.\nHighlight how these insights complement, contrast, or build on each other.\nUse bullet points or short paragraphs for clarity if needed.\nProfessional Analysis:\nOffer your own interpretation or commentary.\nInclude how this could impact professionals in the field or change current thinking.\nDraw a connection to current trends, challenges, or innovations.\nCall to Engagement:\nEnd with a thought-provoking question or invitation for discussion.\nEncourage your network to share their views or experiences related to the topic.\nTone and Style:\nMaintain a professional yet approachable tone.\nEnsure the post is insightful, original, and adds value to your audience.\nLimit the post to 250–400 words to keep it digestible."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "4fd9ca87-dbc7-4d32-b759-6c1e860240f9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        192
+      ],
+      "id": "2e68335a-19d6-42bc-aa11-6a79ff09b9d9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qlEqoI0CY07dX5ZZ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "db765238-43da-4185-b652-a1dddc0223ca",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

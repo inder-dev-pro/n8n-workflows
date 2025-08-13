@@ -1,0 +1,120 @@
+{
+  "name": "AP-TIR",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const htmlContent =$json.text  || '';\n\n// More comprehensive URL regex (optional)\nconst urlRegex = /(https?:\\/\\/(?:[-\\w.])+(?:\\:[0-9]+)?(?:\\/(?:[\\w\\/_.])*(?:\\?(?:[\\w&=%.])*)?(?:\\#(?:[\\w.])*)?)?)/g;\n\nconst urls = [...new Set(htmlContent.match(urlRegex) || [])];\n\n// Add error handling and metadata\nreturn urls.map((url, index) => ({\n  json: { \n    url,\n    index: index + 1,\n    extractedFrom: 'email_html_content'\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "6465ff82-191e-4230-899d-1583b58671f1",
+      "name": "Code",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        0
+      ],
+      "id": "7eacc2c2-bb87-480d-b7aa-f54264430074",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "dataPropertyAttachmentsPrefixName": ""
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "1e4bf2e8-95ef-4986-8077-56778fde9b87",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HYevksvVlCFeMa0k",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "additionalFields": {
+          "tags": ""
+        }
+      },
+      "type": "n8n-nodes-base.urlScanIo",
+      "typeVersion": 1,
+      "position": [
+        490,
+        0
+      ],
+      "id": "4afe469c-bbcc-43eb-bda2-9c0b96a75e5f",
+      "name": "Perform a scan",
+      "credentials": {
+        "urlScanIoApi": {
+          "id": "fKullGWRp3GA7rHc",
+          "name": "urlscan.io account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Perform a scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
